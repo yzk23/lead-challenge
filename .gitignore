@@ -209,4 +209,13 @@ dmypy.json
 
 # pytype static type analyzer
 
+
+### Database ###
+*.accdb
+*.db
+*.dbf
+*.mdb
+*.pdb
+*.sqlite3
+
 # End of https://www.toptal.com/developers/gitignore/api/code,python,flask
