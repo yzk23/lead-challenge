@@ -1,24 +1,30 @@
 from flask import Flask, jsonify, abort, request
 from flask_migrate import Migrate
 from flask_sqlalchemy import SQLAlchemy
+from flask_marshmallow import Marshmallow
 
 app = Flask(__name__)
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///app.sqlite'
 
-models = [
-  {
-    'nome': 'AlexNet',
-    'descricao': 'Modelo de CNN para classificação de imagens. Possui uma estrutura complexa com milhões de parâmetros, o que requer um volume imenso de dados para treinamento.'
-  },
-  {
-    'nome': 'AlexNet2',
-    'descricao': 'Modelo de CNN para classificação de imagens. Possui uma estrutura complexa com milhões de parâmetros, o que requer um volume imenso de dados para treinamento.'
-  },
-]
+DB = SQLAlchemy(app)
+MIGRATE = Migrate(app, DB)
+ma = Marshmallow(app)
 
+from models import Modelo
+
+class ModeloSchema(ma.SQLAlchemyAutoSchema):
+  class Meta:
+    model = Modelo
 
 @app.route('/modelo/', methods=['GET'])
 def get_models():
-  return jsonify({ 'models': models })
+  modelos = Modelo.query.all()
+  modelo_schema = ModeloSchema()
+
+  output = [modelo_schema.dump(modelo) for modelo in modelos]
+
+  return jsonify({ 'models': output }), 200
 
 
 @app.route('/modelo/<string:nome>', methods=['GET'])
@@ -33,14 +39,14 @@ def create_model():
   if not request.json or not 'nome' in request.json:
     abort(400)
 
-  model = {
-    'nome': request.json['nome'],
-    'descricao': request.json['descricao']
-  }
+  modelo = Modelo(request.json['nome'], request.json['descricao'])
+  DB.session.add(modelo)
+  DB.session.commit()
 
-  models.append(model)
+  modelo_schema = ModeloSchema()
+  modelo = modelo_schema.dump(modelo)
 
-  return jsonify(model), 201
+  return jsonify(modelo), 201
 
 
 if __name__ == "__main__":
