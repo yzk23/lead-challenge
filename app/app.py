@@ -5,7 +5,7 @@ from flask_marshmallow import Marshmallow
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///app.sqlite'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database/app.sqlite3'
 
 DB = SQLAlchemy(app)
 MIGRATE = Migrate(app, DB)
