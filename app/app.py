@@ -6,6 +6,10 @@ from flask_marshmallow import Marshmallow
 app = Flask(__name__)
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///app.sqlite'
+# app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql+psycopg2://%s:%s@%s/%s' % (
+#     # ARGS.dbuser, ARGS.dbpass, ARGS.dbhost, ARGS.dbname
+#     os.environ['DBUSER'], os.environ['DBPASS'], os.environ['DBHOST'], os.environ['DBNAME']
+# )
 
 DB = SQLAlchemy(app)
 MIGRATE = Migrate(app, DB)
@@ -29,9 +33,15 @@ def get_models():
 
 @app.route('/modelo/<string:nome>', methods=['GET'])
 def get_model(nome):
-  model = [model for model in models if model['nome'] == nome]
+  modelos = Modelo.query.all()
+  modelo_schema = ModeloSchema()
+
+  modelo = list(filter(lambda modelo: modelo['nome'] == nome, modelos))
+  print(modelo[0])
+  modelo = modelo_schema.dump(modelo)
+  print(modelo)
   
-  return jsonify(model)
+  return jsonify(modelo), 200
 
 
 @app.route('/modelo/', methods=['POST'])
