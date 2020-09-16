@@ -17,7 +17,7 @@ virtualenv env
 ```
 Ativar o ambiente virtual:
 ```bash
-virtualenv env
+env/Scripts/activate
 ```
 Instalando as dependências:
 ```bash
@@ -36,6 +36,7 @@ Rodar a aplicação:
 ```bash
 flask run
 ```
+Obs.: Todos os comandos foram executados em ambiente Windows via PowerShell
 
 ## Routes
 - GET http://127.0.0.1/5000/modelo/
